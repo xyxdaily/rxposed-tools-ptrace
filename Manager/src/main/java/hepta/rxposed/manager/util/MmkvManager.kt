@@ -119,6 +119,7 @@ object MmkvManager {
         val list = mutableMapOf<String,Boolean>()
         for (pkg in RxposedApp.getInstance().packageManager.getInstalledPackages(PackageManager.GET_META_DATA)) {
             val app = pkg.applicationInfo
+//            Log.e("Rzx","install:"+app.packageName)
             if (app.metaData != null && app.metaData.containsKey("rxmodule")) {
                 list.put(app.packageName,false)
             }

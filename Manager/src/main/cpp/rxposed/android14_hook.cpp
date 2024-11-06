@@ -35,8 +35,7 @@ namespace android14 {
         if (rprocess::GetInstance()->is_Start(env, pkgName)) {
             rprocess::GetInstance()->LoadModule(env);
             android_os_Process_setArg_org(env, clazz, name);
-            jmethodID javamethod = env->GetStaticMethodID(clazz, setArgV0_method_name.c_str(),
-                                                          "(Ljava/lang/String;)V");
+            jmethodID javamethod = env->GetStaticMethodID(clazz, setArgV0_method_name.c_str(),"(Ljava/lang/String;)V");
             unHookJmethod_JniFunction(env, clazz, javamethod);
         } else {
             android_os_Process_setArg_org(env, clazz, name);
@@ -64,7 +63,7 @@ namespace android14 {
                                         jintArray managed_fds_to_close, jintArray managed_fds_to_ignore, jboolean is_child_zygote,
                                         jstring instruction_set, jstring app_data_dir, jboolean is_top_app,
                                         jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list,
-                                        jboolean mount_data_dirs, jboolean mount_storage_dirs);
+                                        jboolean mount_data_dirs, jboolean mount_storage_dirs,jboolean mount_sysprop_overrides);
 
     jint nativeForkAndSpecialize_hook(JNIEnv* env, jclass clazz, jint uid, jint gid, jintArray gids,
                                       jint runtime_flags, jobjectArray rlimits,
@@ -72,7 +71,7 @@ namespace android14 {
                                       jintArray managed_fds_to_close, jintArray managed_fds_to_ignore, jboolean is_child_zygote,
                                       jstring instruction_set, jstring app_data_dir, jboolean is_top_app,
                                       jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list,
-                                      jboolean mount_data_dirs, jboolean mount_storage_dirs){
+                                      jboolean mount_data_dirs, jboolean mount_storage_dirs,jboolean mount_sysprop_overrides){
         DEBUG()
         LOGE("nativeForkAndSpecialize_before start uid = %d currentuid = %d pid = %d",uid,getuid(),getpid());
         char * pkgName = const_cast<char *>(env->GetStringUTFChars(nice_name, nullptr));
@@ -89,7 +88,7 @@ namespace android14 {
                                                 mount_external,  se_info,  nice_name,managed_fds_to_close,
                                                 managed_fds_to_ignore,  is_child_zygote,instruction_set,  app_data_dir,
                                                 is_top_app,pkg_data_info_list,  whitelisted_data_info_list,
-                                                mount_data_dirs,  mount_storage_dirs);
+                                                mount_data_dirs,  mount_storage_dirs,mount_sysprop_overrides);
         if(pid == 0){
             LOGE(" child nativeForkAndSpecialize_afore start uid = %d currentuid = %d pid = %d",uid,getuid(),getpid());
             if(is_HostProcess){
@@ -109,17 +108,14 @@ namespace android14 {
         DEBUG()
         if(env != nullptr){
             jclass Zygote_cls =  env->FindClass("com/android/internal/os/Zygote");                        //                      "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)I"
-            jmethodID nativeSpecializeAppProcess_method = env->GetStaticMethodID(Zygote_cls,"nativeForkAndSpecialize", nativeForkAndSpecialize_sign);
+            jmethodID nativeForkAndSpecialize_method = env->GetStaticMethodID(Zygote_cls,"nativeForkAndSpecialize", nativeForkAndSpecialize_sign);
             nativeForkAndSpecialize_org = reinterpret_cast<jint (*)(JNIEnv *, jclass, jint, jint,
                                                                     jintArray, jint, jobjectArray,
                                                                     jint, jstring, jstring,
                                                                     jintArray, jintArray, jboolean,
                                                                     jstring, jstring, jboolean,
                                                                     jobjectArray, jobjectArray,
-                                                                    jboolean,
-                                                                    jboolean)>(HookJmethod_JniFunction(
-                    env, Zygote_cls, nativeSpecializeAppProcess_method,
-                    (uintptr_t) nativeForkAndSpecialize_hook));
+                                                                    jboolean,jboolean,jboolean)>(HookJmethod_JniFunction(env, Zygote_cls, nativeForkAndSpecialize_method,(uintptr_t) nativeForkAndSpecialize_hook));
         } else {
             LOGE("ptrace zygote  Pre_GetEnv failed");
         }
@@ -136,7 +132,8 @@ namespace android14 {
                                            jboolean is_top_app, jobjectArray pkg_data_info_list,
                                            jobjectArray allowlisted_data_info_list,
                                            jboolean mount_data_dirs,
-                                           jboolean mount_storage_dirs);
+                                           jboolean mount_storage_dirs,
+                                           jboolean mount_sysprop_overrides);
 
     void nativeSpecializeAppProcess_hook(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids,
                                          jint runtime_flags,
@@ -147,7 +144,8 @@ namespace android14 {
                                          jboolean is_top_app, jobjectArray pkg_data_info_list,
                                          jobjectArray allowlisted_data_info_list,
                                          jboolean mount_data_dirs,
-                                         jboolean mount_storage_dirs) {
+                                         jboolean mount_storage_dirs,
+                                         jboolean mount_sysprop_overrides) {
 //    nativeSpecializeAppProcess  函数在android 13 小米上已经不能从libandroid_runtime.so 中找到native符号了
         DEBUG()
         LOGE("nativeSpecializeAppProcess_hook start uid = %d currentuid = %d pid = %d", uid, getuid(),getpid());
@@ -166,7 +164,7 @@ namespace android14 {
                                        mount_external, se_info, nice_name, is_child_zygote,
                                        instruction_set, app_data_dir, is_top_app,
                                        pkg_data_info_list, allowlisted_data_info_list,
-                                       mount_data_dirs, mount_storage_dirs);
+                                       mount_data_dirs, mount_storage_dirs,mount_sysprop_overrides);
         zygote_unhook(env,clazz);
         DEBUG()
         return;
@@ -175,7 +173,7 @@ namespace android14 {
     void zygote_nativeSpecializeAppProcess_hook(JNIEnv *env) {
         DEBUG()
         if (env != nullptr) {
-            jclass Zygote_cls = env->FindClass("com/android/internal/os/Zygote");                        //                    "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)I"
+            jclass Zygote_cls = env->FindClass("com/android/internal/os/Zygote");
             jmethodID nativeSpecializeAppProcess_method = env->GetStaticMethodID(Zygote_cls,"nativeSpecializeAppProcess", nativeSpecializeAppProcess_sign);
             nativeSpecializeAppProcess_org = reinterpret_cast<void (*)(JNIEnv *, jclass, jint, jint,
                                                                        jintArray, jint,
@@ -184,7 +182,7 @@ namespace android14 {
                                                                        jboolean, jstring, jstring,
                                                                        jboolean,
                                                                        jobjectArray, jobjectArray,
-                                                                       jboolean,
+                                                                       jboolean,jboolean,
                                                                        jboolean)>(HookJmethod_JniFunction(
                     env, Zygote_cls, nativeSpecializeAppProcess_method,(uintptr_t) nativeSpecializeAppProcess_hook));
         } else {
@@ -202,7 +200,7 @@ namespace android14 {
         jmethodID javamethod = env->GetStaticMethodID(Process_cls, "getUidForName","(Ljava/lang/String;)I");
         void *libandroid_runtime = dlopen("libandroid_runtime.so", RTLD_NOW);
         uintptr_t getUidForName = reinterpret_cast<uintptr_t>(dlsym(libandroid_runtime,"_Z32android_os_Process_getUidForNameP7_JNIEnvP8_jobjectP8_jstring"));
-        INIT_HOOK_PlatformABI(env, nullptr, javamethod, (uintptr_t *) getUidForName, 0x109);
+        INIT_HOOK_PlatformABI(env, Process_cls, javamethod, (uintptr_t *) getUidForName, 0x109);
 
         uintptr_t art_javamethod_method = GetArtMethod(env, Process_cls, javamethod);
         uintptr_t native_art_art_javamethod_method = GetOriginalNativeFunction((uintptr_t *) art_javamethod_method);

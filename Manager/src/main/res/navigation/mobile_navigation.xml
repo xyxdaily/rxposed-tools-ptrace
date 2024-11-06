@@ -44,7 +44,6 @@
         tools:layout="@layout/processlist_fragment"/>
 
 
-
     <fragment
         android:id="@+id/settings_dest"
         android:name="hepta.rxposed.manager.fragment.SettingsFragment"
@@ -59,7 +58,13 @@
         android:id="@+id/modules_dest"
         android:name="hepta.rxposed.manager.fragment.LoadModule.ModuleFragment"
         android:label="@string/modules"
-        tools:layout="@layout/fragment_modules" />
+        tools:layout="@layout/fragment_modules" >
+
+        <action
+            android:id="@+id/action_home_to_modules"
+            app:destination="@id/modules_dest"/>
+
+    </fragment>
     <fragment
         android:id="@+id/pluginject_dest"
         android:name="hepta.rxposed.manager.fragment.InjectPlug.PlugFragment"

@@ -22,9 +22,10 @@ cmake_minimum_required(VERSION 3.22.1)
 #endif()
 
 
+add_subdirectory(ziparchive)
 
-
-#include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(ziparchive/include)
+include_directories(ziparchive/base/include)
 
 add_library( # Sets the name of the library.
         hideload
@@ -42,12 +43,17 @@ add_library( # Sets the name of the library.
         linker_version.cpp
         linker_symbol.cpp
         linker_relocate.cpp
-        jni_hook.cpp
+        jni_proxy.cpp
         soinfo_12_transform.cpp
         soinfo_11_transform.cpp
         soinfo_12L_transform.cpp
         entry.cpp
         )
 
+target_link_libraries( # Specifies the target library.
+        hideload
+        # Links the target library to the log library
+        # included in the NDK.
+        ziparchive)
 
 

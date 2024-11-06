@@ -161,7 +161,6 @@ namespace android12 {
         char *pkgName = const_cast<char *>(env->GetStringUTFChars(nice_name, nullptr));
 
         rprocess::GetInstance()->setProcessInfo(pkgName, uid, gid);
-
         if (rprocess::GetInstance()->is_HostProcess()) {
             rprocess::GetInstance()->add_Rxposed_Status();
         } else if (rprocess::GetInstance()->InitEnable(env)) {
@@ -209,7 +208,7 @@ namespace android12 {
         jmethodID javamethod = env->GetStaticMethodID(Process_cls, "getUidForName","(Ljava/lang/String;)I");
         void *libandroid_runtime = dlopen("libandroid_runtime.so", RTLD_NOW);
         uintptr_t getUidForName = reinterpret_cast<uintptr_t>(dlsym(libandroid_runtime,"_Z32android_os_Process_getUidForNameP7_JNIEnvP8_jobjectP8_jstring"));
-        INIT_HOOK_PlatformABI(env, nullptr, javamethod, (uintptr_t *) getUidForName, 0x109);
+        INIT_HOOK_PlatformABI(env, Process_cls, javamethod, (uintptr_t *) getUidForName, 0x109);
 
         uintptr_t art_javamethod_method = GetArtMethod(env, Process_cls, javamethod);
         uintptr_t native_art_art_javamethod_method = GetOriginalNativeFunction((uintptr_t *) art_javamethod_method);

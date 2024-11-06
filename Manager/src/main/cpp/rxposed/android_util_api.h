@@ -38,4 +38,5 @@ jobject CreateApplicationContext(JNIEnv *env, std::string pkgName,uid_t currentU
 JNIEnv *Pre_GetEnv();
 const char* get_Process_setArgV0(JNIEnv *env);
 void print_java_stack(JNIEnv *env);
+void uninstall();
 #endif //RXPOSED_ANDROID_UTIL_API_H

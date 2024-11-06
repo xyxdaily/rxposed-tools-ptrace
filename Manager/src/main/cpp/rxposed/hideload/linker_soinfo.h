@@ -6,6 +6,7 @@
 #include "linker_symbol.h"
 #include "linker_namespaces.h"
 #include "linker_gnu_hash.h"
+#include "elf.h"
 
 //android 7.12 在base下面还有一个entry,8.0以上则没有了
 
@@ -167,7 +168,6 @@ public:
 //    void call_pre_init_constructors();
     bool prelink_image();
     bool link_image(SymbolLookupList& lookup_list);
-
 //    bool protect_relro();
 
     void add_child(soinfo* child);
@@ -221,7 +221,9 @@ public:
 //    size_t get_ref_count() const;
 
 //    soinfo* get_local_group_root() const;
-
+    int pltHook(char * plt_fun_name,void * new_fun ,void * &old_fun);
+    int pltUnHook(char * plt_fun_name,void * new_fun);
+    void* getPltFunAddrByName(char*fun_name) const;
     void set_soname(const char* soname);
     const char* get_soname() const;
 //    void set_realpath(const char* path);

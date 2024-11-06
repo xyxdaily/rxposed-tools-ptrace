@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuProvider
@@ -90,6 +91,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+//                when(menuItem.itemId){
+//                    android.R.id.home:
+//
+//                }
                 return menuItem.onNavDestinationSelected(findNavController(R.id.my_nav_host_fragment))
             }
 

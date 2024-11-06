@@ -84,6 +84,8 @@ jfieldID getArtMethod_filed(JNIEnv *env){
 
 bool INIT_HOOK_PlatformABI(JNIEnv *env, jclass clazz, jmethodID methodId, uintptr_t *native, uint32_t flags) {
 
+
+    // 这个函数没有问题，但是抽出来单独使用经常会崩溃，需要注意有些系统函数库和和符号在app进程里是有隔离的
     api = android_get_device_api_level();
     if (api >= __ANDROID_API_R__) {
         field_art_method = getArtMethod_filed(env);

@@ -93,7 +93,7 @@ class ModuleFragment : Fragment() {
                 Log.e("Rzx",name+": not found")
                 continue
             }
-            Log.e("Rzx","initData"+name+": "+pKgList[name])
+            Log.e("Rzx","initData:"+name+": "+pKgList[name])
         }
         return PackageList
     }

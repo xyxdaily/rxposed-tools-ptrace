@@ -150,7 +150,7 @@ bool rprocess::InitEnable(JNIEnv *pEnv) {
     if(is_isIsolatedProcess()) {   //也不能是is_isIsolatedProcess，目前不支持
         return false;
     }
-    hide_maps();
+//    hide_maps();
     return InitModuleInfo(pEnv);
     DEBUG()
 }

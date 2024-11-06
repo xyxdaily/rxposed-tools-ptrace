@@ -91,7 +91,7 @@ namespace android11 {
                                                 mount_data_dirs,  mount_storage_dirs);
 //        zygote_unhook(env, clazz);
         if(pid == 0){
-            LOGE("child nativeForkAndSpecialize_afore start uid = %d currentuid = %d pid = %d",uid,getuid(),getpid());
+            LOGE("child nativeForkAndSpecialize_before start uid = %d currentuid = %d pid = %d",uid,getuid(),getpid());
             if(is_HostProcess){
                 rprocess::GetInstance()->add_Rxposed_Status();
             } else if (is_Init) {
@@ -205,7 +205,7 @@ namespace android11 {
         jmethodID javamethod = env->GetStaticMethodID(Process_cls, "getUidForName","(Ljava/lang/String;)I");
         void *libandroid_runtime = dlopen("libandroid_runtime.so", RTLD_NOW);
         uintptr_t getUidForName = reinterpret_cast<uintptr_t>(dlsym(libandroid_runtime,"_Z32android_os_Process_getUidForNameP7_JNIEnvP8_jobjectP8_jstring"));
-        INIT_HOOK_PlatformABI(env, nullptr, javamethod, (uintptr_t *) getUidForName, 0x109);
+        INIT_HOOK_PlatformABI(env, Process_cls, javamethod, (uintptr_t *) getUidForName, 0x109);
 
         uintptr_t art_javamethod_method = GetArtMethod(env, Process_cls, javamethod);
         uintptr_t native_art_art_javamethod_method = GetOriginalNativeFunction((uintptr_t *) art_javamethod_method);

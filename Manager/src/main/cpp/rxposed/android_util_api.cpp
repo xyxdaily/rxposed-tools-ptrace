@@ -6,9 +6,36 @@
 #include <dlfcn.h>
 #include "android_util_api.h"
 #include "hideload/entry.h"
-
+#include "hideload/linker.h"
 using namespace std;
 
+int (*pthread_attr_destroy_old)(void* handle);
+int pthread_attr_destroy_new(void* handle){
+
+    LOGD("%s","pthread_attr_destroy_new be call");
+    void *so_handle = dlopen("librxposed.so",RTLD_LOCAL);
+    if(so_handle != nullptr){
+        LOGD("%s","librxposed.so open succ");
+    } else{
+        LOGD("%s","librxposed.so open failes");
+    }
+//    [[clang::musttail]] return dlclose(self_handle);
+    return pthread_attr_destroy_old(handle);
+}
+
+
+void uninstall(){
+    LOGD("%s","start_install_rxposed_uninstall");
+    soinfo* si = find_system_library_byname("libart.so");
+    if(si == nullptr){
+        LOGD("%s","find_system_library_byname libart.so failed");
+        return;
+    }
+    soinfo custom_si ;
+    custom_si.transform(si);
+    custom_si.pltHook("pthread_attr_destroy", (void *) pthread_attr_destroy_new, reinterpret_cast<void *&>(pthread_attr_destroy_old));
+
+}
 
 vector<string> string_split(string str,string pattern)
 {
